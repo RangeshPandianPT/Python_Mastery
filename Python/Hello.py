@@ -1,0 +1,8 @@
+print ("Hello World")
+print ("I am a new Learner of Python")
+print(3)
+print(358)
+print(50000)
+print(3 + 3)
+print(2 * 5)
+print("I am",20, "years old.")
