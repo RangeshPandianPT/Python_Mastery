@@ -115,3 +115,36 @@ thislist.extend(tropical)
 print(thislist)
 
 #Add Any Iterable
+thislist = ["apple", "banana", "cherry"]
+thistuple = ("kiwi", "orange")
+thislist.extend(thistuple)
+print(thislist)
+
+#Python - Remove List Items
+thislist = ["apple", "banana", "cherry"]
+thislist.remove("banana")
+print(thislist)
+
+thislist = ["apple", "banana", "cherry", "banana", "kiwi"]
+thislist.remove("banana")
+print(thislist)
+
+#Remove Specified Index
+thislist = ["apple", "banana", "cherry"]
+thislist.pop(1)
+print(thislist)
+
+thislist = ["apple", "banana", "cherry"]
+thislist.pop()
+print(thislist)
+
+#Example
+#Delete the entire list:
+
+thislist = ["apple", "banana", "cherry"]
+del thislist
+
+#Clear the List
+thislist = ["apple", "banana", "cherry"]
+thislist.clear()
+print(thislist)
