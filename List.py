@@ -148,3 +148,31 @@ del thislist
 thislist = ["apple", "banana", "cherry"]
 thislist.clear()
 print(thislist)
+
+#Loop Through a List
+thislist = ["apple", "banana", "cherry"]
+for x in thislist:
+    print(x)
+
+thislist = ["apple", "banana", "cherry"]
+i = 0
+while i < len(thislist):
+    print(thislist[i])
+    i = i + 1
+
+thislist = ["apple", "banana", "cherry"]
+[print(x) for x in thislist]
+
+#Python - Sort Lists
+
+#ExampleGet your own Python Server
+#Sort the list alphabetically:
+thislist = ["orange", "mango", "kiwi", "pineapple", "banana"]
+thislist.sort()
+print(thislist)
+
+#Example
+#Sort the list descending:
+thislist = ["orange", "mango", "kiwi", "pineapple", "banana"]
+thislist.sort(reverse = True)
+print(thislist)
