@@ -10,7 +10,7 @@ print(x)
 #Casting
 x = str(3)    # x will be '3'
 y = int(3)    # y will be 3
-z = float(3)  # z will be 3.0
+z: float = float(3)  # z will be 3.0
 
 print(type(x))
 print(type(y))
@@ -42,3 +42,37 @@ x, y, z = fruits
 print(x)
 print(y)
 print(z)
+
+x = "Python"
+y = "is"
+z = "awesome"
+print(x, y, z)
+print(x + y + z)
+
+#Global Variables
+x = "awesome"
+
+def myfunc():
+    print("Python is " + x)
+
+myfunc()
+
+#Example
+x = "awesome"
+
+def myfunc():
+    x = "fantastic"
+    print("Python is " + x)
+
+myfunc()
+
+print("Python is " + x)
+
+#The global Keyword
+def myfunc():
+    global x
+    x = "fantastic"
+
+myfunc()
+
+print("Python is " + x)
