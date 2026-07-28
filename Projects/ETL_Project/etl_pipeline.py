@@ -1,17 +1,23 @@
 import pandas as pd
 import sqlite3
 import os
+import sys
+
+# Setup logging
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from Python.Logging_Config import setup_logger
+logger = setup_logger("ETL_Pipeline")
 
 def extract_data(file_path):
     """Extract data from a CSV file."""
-    print(f"Extracting data from {file_path}...")
+    logger.info(f"Extracting data from {file_path}...")
     df = pd.read_csv(file_path)
-    print(f"Extracted {len(df)} rows.")
+    logger.info(f"Extracted {len(df)} rows.")
     return df
 
 def transform_data(df):
     """Transform the data: Calculate total revenue per transaction and group by product."""
-    print("Transforming data...")
+    logger.info("Transforming data...")
     # Calculate TotalRevenue for each row
     df['TotalRevenue'] = df['Quantity'] * df['Price']
     
@@ -21,12 +27,12 @@ def transform_data(df):
         Total_Revenue=('TotalRevenue', 'sum')
     ).reset_index()
     
-    print("Transformation complete.")
+    logger.info("Transformation complete.")
     return summary_df
 
 def load_data(df, db_path, table_name):
     """Load the transformed data into a SQLite database."""
-    print(f"Loading data into {db_path} (table: {table_name})...")
+    logger.info(f"Loading data into {db_path} (table: {table_name})...")
     conn = sqlite3.connect(db_path)
     
     # Save the dataframe to SQLite, replace if exists
@@ -36,7 +42,7 @@ def load_data(df, db_path, table_name):
     cursor = conn.cursor()
     cursor.execute(f"SELECT COUNT(*) FROM {table_name}")
     row_count = cursor.fetchone()[0]
-    print(f"Successfully loaded {row_count} rows into the database.")
+    logger.info(f"Successfully loaded {row_count} rows into the database.")
     
     conn.close()
 
@@ -47,7 +53,7 @@ if __name__ == "__main__":
     csv_file = os.path.join(current_dir, "sample_sales.csv")
     sqlite_db = os.path.join(current_dir, "sales_warehouse.db")
     
-    print("--- Starting ETL Pipeline ---")
+    logger.info("--- Starting ETL Pipeline ---")
     
     # 1. Extract
     if os.path.exists(csv_file):
@@ -55,13 +61,11 @@ if __name__ == "__main__":
         
         # 2. Transform
         transformed_data = transform_data(raw_data)
-        print("\nTransformed Data Preview:")
-        print(transformed_data)
-        print()
+        logger.info(f"\nTransformed Data Preview:\n{transformed_data}")
         
         # 3. Load
         load_data(transformed_data, sqlite_db, "product_sales_summary")
         
-        print("--- ETL Pipeline Completed Successfully ---")
+        logger.info("--- ETL Pipeline Completed Successfully ---")
     else:
-        print(f"Error: Could not find {csv_file}. Please ensure it exists in the directory.")
+        logger.error(f"Could not find {csv_file}. Please ensure it exists in the directory.")

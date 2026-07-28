@@ -1,0 +1,31 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.11"
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest fastapi uvicorn sqlalchemy requests pandas
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Run Pytest
+      run: |
+        # Navigating to API project to run tests
+        cd Projects/API_Database_Project
+        pytest
