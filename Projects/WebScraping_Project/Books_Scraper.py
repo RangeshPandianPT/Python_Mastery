@@ -7,7 +7,8 @@
 # Target: http://books.toscrape.com/ (A site specifically for scraping practice)
 # ============================================================
 
-import requests
+import aiohttp
+import asyncio
 from bs4 import BeautifulSoup
 import pandas as pd
 import time
@@ -18,52 +19,66 @@ print("1. SCRAPING DATA FROM BOOKS.TOSCRAPE.COM")
 print("=" * 50)
 
 BASE_URL = "http://books.toscrape.com/catalogue/page-{}.html"
-scraped_books = []
-pages_to_scrape = 3  # We'll just scrape the first 3 pages for this example
+pages_to_scrape = 3
 
-for page in range(1, pages_to_scrape + 1):
-    url = BASE_URL.format(page)
+async def fetch_page(session, url, page):
     print(f"Scraping page {page}: {url}")
-    
-    response = requests.get(url)
-    if response.status_code != 200:
-        print(f"Failed to retrieve page {page}. Status Code: {response.status_code}")
-        continue
+    async with session.get(url) as response:
+        if response.status != 200:
+            print(f"Failed to retrieve page {page}. Status Code: {response.status}")
+            return None
+        return await response.text()
+
+def parse_books(html_content):
+    if not html_content:
+        return []
         
-    soup = BeautifulSoup(response.content, 'html.parser')
-    
-    # Find all book articles on the page
+    soup = BeautifulSoup(html_content, 'html.parser')
     books = soup.find_all('article', class_='product_pod')
+    page_books = []
     
     for book in books:
-        # Title is inside an <h3> tag, inside an <a> tag. 'title' attribute holds full text.
         title = book.find('h3').find('a')['title']
-        
-        # Price is inside a <p> with class 'price_color'
         price_text = book.find('p', class_='price_color').text
-        # Price comes with a £ sign (e.g., '£51.77'), we strip it and convert to float
         price = float(price_text.replace('£', '').replace('Â', '').strip())
         
-        # Rating is inside a <p> with class 'star-rating'
-        # Classes are like ['star-rating', 'Three'], we want the second one.
         rating_classes = book.find('p', class_='star-rating')['class']
         rating = rating_classes[1] if len(rating_classes) > 1 else 'None'
         
-        # In stock availability
         availability = book.find('p', class_='instock availability').text.strip()
         
-        scraped_books.append({
+        page_books.append({
             'Title': title,
             'Price_GBP': price,
             'Rating': rating,
             'Availability': availability
         })
+    return page_books
+
+async def main():
+    scraped_books = []
+    
+    start_time = time.time()
+    
+    async with aiohttp.ClientSession() as session:
+        tasks = []
+        for page in range(1, pages_to_scrape + 1):
+            url = BASE_URL.format(page)
+            tasks.append(fetch_page(session, url, page))
+            
+        html_contents = await asyncio.gather(*tasks)
         
-    # Polite delay between requests
-    time.sleep(1)
+        for html_content in html_contents:
+            books_on_page = parse_books(html_content)
+            scraped_books.extend(books_on_page)
+            
+    print(f"\nSuccessfully scraped {len(scraped_books)} books in {time.time() - start_time:.2f} seconds.")
+    return scraped_books
 
-print(f"\nSuccessfully scraped {len(scraped_books)} books.")
-
+if __name__ == "__main__":
+    if os.name == 'nt':
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    scraped_books = asyncio.run(main())
 
 print("\n" + "=" * 50)
 print("2. SAVING DATA TO CSV")
