@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies (assuming standard ones for FastAPI + SQLite)
-RUN pip install --no-cache-dir fastapi uvicorn sqlalchemy
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on
 EXPOSE 8000

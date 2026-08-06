@@ -12,3 +12,12 @@ class Book(BookBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class Passenger(BaseModel):
+    pclass: int
+    sex: str
+    age: float
+    sibsp: int
+    parch: int
+    fare: float
+    embarked: str

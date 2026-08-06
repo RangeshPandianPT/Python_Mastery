@@ -2,7 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 import database
 import schemas
-
+import pandas as pd
+import joblib
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
@@ -15,6 +16,16 @@ database.Base.metadata.create_all(bind=database.engine)
 logger.info("Database tables initialized.")
 
 app = FastAPI(title="Bookstore API", description="A simple CRUD API with Database integration")
+
+# Load the trained machine learning model
+MODEL_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ML_Project', 'titanic_rf_model.joblib'))
+ml_model = None
+try:
+    ml_model = joblib.load(MODEL_PATH)
+    logger.info("ML model loaded successfully.")
+except FileNotFoundError:
+    logger.warning(f"ML model not found at {MODEL_PATH}. Prediction endpoint will not work until model is trained.")
+
 
 # Dependency to get the database session
 def get_db():
@@ -46,3 +57,17 @@ def read_book(book_id: int, db: Session = Depends(get_db)):
         logger.warning(f"Book id {book_id} not found")
         raise HTTPException(status_code=404, detail="Book not found")
     return book
+
+@app.post("/predict")
+def predict_survival(passenger: schemas.Passenger):
+    if ml_model is None:
+        raise HTTPException(status_code=503, detail="ML model is not available")
+    
+    # Convert payload to DataFrame for the model
+    passenger_df = pd.DataFrame([passenger.model_dump()])
+    
+    # Predict
+    prediction = ml_model.predict(passenger_df)
+    survived = bool(prediction[0] == 1)
+    
+    return {"survived": survived}
