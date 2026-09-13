@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./API_Database_Project
+    container_name: bookstore_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./shared_data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  scraper:
+    build: ./WebScraping_Project
+    container_name: web_scraper
+    volumes:
+      - ./shared_data:/data
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  etl:
+    build: ./ETL_Project
+    container_name: etl_pipeline
+    volumes:
+      - ./shared_data:/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      api:
+        condition: service_started
+      scraper:
+        condition: service_completed_successfully
