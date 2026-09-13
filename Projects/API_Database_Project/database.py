@@ -1,8 +1,12 @@
 from sqlalchemy import create_engine, Column, Integer, String, Float
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# Create a SQLite database in the current directory
-SQLALCHEMY_DATABASE_URL = "sqlite:///./books.db"
+import os
+
+# Create a SQLite database in the /app/data volume if it exists (Docker), else current dir
+data_dir = "/app/data" if os.path.exists("/app/data") else "."
+db_path = os.path.abspath(os.path.join(data_dir, "books.db"))
+SQLALCHEMY_DATABASE_URL = f"sqlite:///{db_path}"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
