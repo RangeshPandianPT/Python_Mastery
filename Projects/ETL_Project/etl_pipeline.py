@@ -9,7 +9,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 from Python.Logging_Config import setup_logger
 logger = setup_logger("ETL_Pipeline")
 
-API_URL = "http://api:8000/books/"
+API_URL = os.environ.get("API_URL", "http://localhost:8000/books/")
 
 def extract_data(file_path):
     """Extract data from the scraped CSV file."""
@@ -59,7 +59,7 @@ def load_data(df):
 if __name__ == "__main__":
     # Define file paths
     # When running in docker, we expect the data to be in /data
-    csv_file = "/data/scraped_books.csv" if os.path.exists("/data") else "scraped_books.csv"
+    csv_file = "/data/scraped_books.csv" if os.path.exists("/data") else os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'shared_data', 'scraped_books.csv'))
     
     logger.info("--- Starting ETL Pipeline ---")
     
