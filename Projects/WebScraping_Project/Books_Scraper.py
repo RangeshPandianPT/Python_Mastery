@@ -88,7 +88,9 @@ print("=" * 50)
 df = pd.DataFrame(scraped_books)
 
 # Save to CSV
-output_dir = "/data" if os.path.exists("/data") else "."
+output_dir = "/data" if os.path.exists("/data") else os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'shared_data'))
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
 csv_filename = os.path.join(output_dir, "scraped_books.csv")
 df.to_csv(csv_filename, index=False, encoding='utf-8')
 print(f"Data saved to {os.path.abspath(csv_filename)}")
