@@ -8,8 +8,10 @@ services:
       - "8000:8000"
     volumes:
       - ./shared_data:/app/data
+      - ./ML_Project:/app/models:ro
     environment:
       - PYTHONUNBUFFERED=1
+      - MODEL_PATH=/app/models/titanic_rf_model.joblib
 
   scraper:
     build: ./WebScraping_Project
@@ -26,6 +28,7 @@ services:
       - ./shared_data:/data
     environment:
       - PYTHONUNBUFFERED=1
+      - API_URL=http://api:8000/books/
     depends_on:
       api:
         condition: service_started
