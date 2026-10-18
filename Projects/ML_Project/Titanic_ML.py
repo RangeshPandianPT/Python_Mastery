@@ -10,8 +10,8 @@
 # 5. Model Saving
 # ============================================================
 
+import os
 import pandas as pd
-import numpy as np
 import seaborn as sns
 import joblib
 from sklearn.model_selection import train_test_split
@@ -21,7 +21,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+from sklearn.metrics import accuracy_score, classification_report
 
 print("=" * 50)
 print("1. LOADING DATA")
@@ -117,7 +117,7 @@ print("5. SAVING THE MODEL")
 print("=" * 50)
 
 # Let's say Random Forest performed slightly better, so we save that pipeline
-model_filename = 'titanic_rf_model.joblib'
+model_filename = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'titanic_rf_model.joblib')
 joblib.dump(rf_pipeline, model_filename)
 print(f"Model successfully saved as '{model_filename}'")
 
@@ -127,4 +127,6 @@ sample_passenger = pd.DataFrame([{
     'pclass': 3, 'sex': 'male', 'age': 22.0, 'sibsp': 1, 'parch': 0, 'fare': 7.25, 'embarked': 'S'
 }])
 sample_prediction = loaded_model.predict(sample_passenger)
-print(f"\nPrediction for a sample passenger (3rd class, male, 22yo): {'Survived' if sample_prediction[0]==1 else 'Did not survive'}")
+outcome = 'Survived' if sample_prediction[0] == 1 else 'Did not survive'
+print(f"\nPrediction for a sample passenger (3rd class, male, 22yo): {outcome}")
+
