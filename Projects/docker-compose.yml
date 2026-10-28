@@ -12,6 +12,13 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - MODEL_PATH=/app/models/titanic_rf_model.joblib
+      - METRICS_PATH=/app/models/model_metrics.json
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   scraper:
     build: ./WebScraping_Project
@@ -31,6 +38,6 @@ services:
       - API_URL=http://api:8000/books/
     depends_on:
       api:
-        condition: service_started
+        condition: service_healthy
       scraper:
         condition: service_completed_successfully
