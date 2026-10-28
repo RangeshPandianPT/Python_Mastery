@@ -105,4 +105,3 @@ if __name__ == "__main__":
         logger.info("--- ETL Pipeline Completed Successfully ---")
     else:
         logger.error(f"Could not find {csv_file}. Please ensure the Web Scraper has run.")
-

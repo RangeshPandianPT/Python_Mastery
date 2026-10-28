@@ -32,4 +32,3 @@ def test_extract_data(tmp_path):
     extracted = extract_data(str(csv_file))
     assert len(extracted) == 1
     assert extracted.iloc[0]['Title'] == 'Sample Book'
-
